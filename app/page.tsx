@@ -21,6 +21,7 @@ export default function Home() {
   const { isLocationAllowed } = useLocationPermission()
   const [inputs, setInputs] = useState(['출발지 입력', '도착지 입력'])
   const [isLoading, setIsLoading] = useState(false)
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(true)
 
   const [startLocation, setStartLocation] = useState<{
     latitude: number
@@ -57,15 +58,6 @@ export default function Home() {
       console.log('이 브라우저는 위치 정보를 지원하지 않습니다.')
     }
   }, [])
-
-  const handleInputChange = (
-    index: number,
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const newInputs = [...inputs]
-    newInputs[index] = event.target.value
-    setInputs(newInputs)
-  }
 
   const handleGpsClick = () => {
     if (navigator.geolocation) {
@@ -108,14 +100,9 @@ export default function Home() {
     }
   }
 
-  // const handleData = (data: string, index: number) => {
-  //   const newInputs = [...inputs]
-  //   newInputs[index] = data
-  //   setInputs(newInputs)
-  // }
-
   const handleSearchClick = async () => {
     setIsLoading(true)
+    setIsBottomSheetOpen(false)
 
     if (inputs[0]) {
       await handleGeocoding(inputs[0], setStartLocation)
@@ -174,14 +161,21 @@ export default function Home() {
     }
   }
 
+  const handleData = (data: string, index: number) => {
+    const newInputs = [...inputs]
+    newInputs[index] = data
+    setInputs(newInputs)
+  }
+
   return (
     <div className="flex min-h-dvh flex-col justify-center px-5">
       <SiteHeader />
       <div className="flex flex-1 flex-col items-center space-y-8 pb-[76px] pt-6">
         <PlaceInput
           inputs={inputs}
-          onChange={handleInputChange}
           icon={<button onClick={handleGpsClick}>{gpsIcon}</button>}
+          onSendData={handleData}
+          isBottomSheetOpen={isBottomSheetOpen}
         />
 
         <div className="flex flex-col items-center justify-center">
